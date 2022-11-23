@@ -86,7 +86,12 @@ class GameWorldViewModel(
         return UiState(
             0,
             gameWorld.size,
-            UiState.Dino(AvatarState.RUNNING, yPosFeet = gameWorld.size.groundY)
+            UiState.Dino(AvatarState.RUNNING, yPosFeet = gameWorld.size.groundY),
+            obstacles = gameWorld.obstacles.map {
+                UiState.Obstacle(
+
+                )
+            }
         )
     }
 
@@ -101,8 +106,17 @@ data class GameWorldState(
     var gameWorldTicks: Long = 0,
     var size: UiState.CanvasSize = UiState.CanvasSize(0, 0),
     var dinoYPosFeet: Float = 0f,
-    var dinoJumpState: DinoJumpState = DinoJumpState.RUNNING
+    var dinoJumpState: DinoJumpState = DinoJumpState.RUNNING,
+    var obstacles: MutableList<Obstacle> = mutableListOf()
 ) {
+
+    data class Obstacle(
+        var xPosLeft: Float,
+        var yPosBottom: Float,
+        val width: Int = 50,
+        val height: Int = 50
+    )
+
     enum class DinoJumpState {
         JUMPING,
         FALLING,
