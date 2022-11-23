@@ -1,17 +1,22 @@
 package com.example.dino.presentation
 
 import android.util.Log
-import androidx.compose.runtime.withFrameMillis
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dino.presentation.GameWorldState.DinoJumpState
+import com.example.dino.presentation.GameWorldState.DinoJumpState.FALLING
+import com.example.dino.presentation.GameWorldState.DinoJumpState.JUMPING
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.update
+
+private const val MILLIS_PER_FRAME_24FPS = (1000 / 24).toLong()
+
+private const val JUMP_SPEED = 20
 
 class GameWorldViewModel(
     private val gameWorld: GameWorldState = GameWorldState(gameWorldTicks = 0)
@@ -26,26 +31,28 @@ class GameWorldViewModel(
                 if (gameWorld.size.height != 0) {
                     onGameLoop()
                 }
-                delay(42)
+                delay(MILLIS_PER_FRAME_24FPS)
             }
         }.launchIn(viewModelScope)
     }
 
     fun onCanvasResize(width: Int, height: Int) {
-        gameWorld.size = UiState.CanvasSize(width, height)
+        if (gameWorld.size.width != width || gameWorld.size.height != height) {
+            gameWorld.size = UiState.CanvasSize(width, height)
+            gameWorld.dinoYPosFeet = gameWorld.size.groundY
+        }
     }
 
     private fun emitUpdatedDinoState() {
-        _uiState.getAndUpdate { oldUiState ->
+        _uiState.update {
             UiState(
                 gameWorldTicks = gameWorld.gameWorldTicks,
                 dino = UiState.Dino(
                     avatarState = when (gameWorld.dinoJumpState) {
-                        DinoJumpState.JUMPING -> AvatarState.JUMPING
-                        DinoJumpState.FALLING -> AvatarState.JUMPING
                         DinoJumpState.RUNNING -> AvatarState.RUNNING
+                        else -> AvatarState.JUMPING
                     },
-                    yPos = gameWorld.dinoY
+                    yPosFeet = gameWorld.dinoYPosFeet
                 ),
                 canvasSize = gameWorld.size
             )
@@ -53,48 +60,39 @@ class GameWorldViewModel(
     }
 
     private fun onGameLoop() {
-        gameWorld.gameWorldTicks = gameWorld.gameWorldTicks + 1
-        Log.d("!!!", "loop: $this gwt ${gameWorld.gameWorldTicks}")
+        gameWorld.gameWorldTicks++
 
-        when (gameWorld.dinoJumpState) {
-            DinoJumpState.JUMPING -> {
-                Log.d("!!!", "loop: jumping ${gameWorld.dinoY}")
-                if (gameWorld.dinoY < gameWorld.size.height) {
-                    gameWorld.dinoY += 20
-                } else {
-                    gameWorld.dinoJumpState = DinoJumpState.FALLING
-                }
+        if (gameWorld.dinoJumpState == JUMPING) {
+            // we don't want dino's feet to go within 100px of the top edge
+            if (gameWorld.dinoYPosFeet >= 100) {
+                gameWorld.dinoYPosFeet -= JUMP_SPEED
+            } else {
+                gameWorld.dinoJumpState = FALLING
             }
-            DinoJumpState.FALLING -> {
-                Log.d("!!!", "loop: falling ${gameWorld.dinoY}")
-                if (gameWorld.dinoY > 0f) {
-                    gameWorld.dinoY -= 20
-                } else {
-                    gameWorld.dinoJumpState = DinoJumpState.RUNNING
-                }
-            }
-            DinoJumpState.RUNNING -> {
-                // TODO: no action i think
+        }
+        if (gameWorld.dinoJumpState == FALLING) {
+            if (gameWorld.dinoYPosFeet < gameWorld.size.groundY) {
+                gameWorld.dinoYPosFeet += JUMP_SPEED
+            } else {
+                gameWorld.dinoYPosFeet = gameWorld.size.groundY
+                gameWorld.dinoJumpState = DinoJumpState.RUNNING
             }
         }
 
         emitUpdatedDinoState()
-//        Log.d("!!!", "ticks: ${gameWorld.gameWorldTicks}")
     }
 
     private fun createInitialState(): UiState {
         return UiState(
             0,
             gameWorld.size,
-            UiState.Dino(AvatarState.RUNNING, yPos = 0f)
+            UiState.Dino(AvatarState.RUNNING, yPosFeet = gameWorld.size.groundY)
         )
     }
 
     fun onReceiveJumpInput() {
-        Log.d("!!!", "onReceiveJumpInput")
-        if (gameWorld.dinoJumpState == DinoJumpState.RUNNING) {
-            Log.d("!!!", "onReceiveJumpInput - JUMP")
-            gameWorld.dinoJumpState = DinoJumpState.JUMPING
+        if (gameWorld.dinoJumpState != JUMPING && gameWorld.dinoJumpState != FALLING) {
+            gameWorld.dinoJumpState = JUMPING
         }
     }
 }
@@ -102,7 +100,7 @@ class GameWorldViewModel(
 data class GameWorldState(
     var gameWorldTicks: Long = 0,
     var size: UiState.CanvasSize = UiState.CanvasSize(0, 0),
-    var dinoY: Float = 0f,
+    var dinoYPosFeet: Float = 0f,
     var dinoJumpState: DinoJumpState = DinoJumpState.RUNNING
 ) {
     enum class DinoJumpState {

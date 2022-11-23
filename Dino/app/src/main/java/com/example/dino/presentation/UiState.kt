@@ -5,10 +5,13 @@ data class UiState(
     val canvasSize: CanvasSize,
     val dino: Dino
 ) {
-    data class CanvasSize(val width: Int, val height: Int)
+    data class CanvasSize(val width: Int, val height: Int) {
+        val groundY: Float
+            get() = height * .75f
+    }
 
     data class Dino(
         val avatarState: AvatarState,
-        val yPos: Float
+        val yPosFeet: Float
     )
 }

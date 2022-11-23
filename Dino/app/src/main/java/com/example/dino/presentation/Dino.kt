@@ -47,7 +47,6 @@ object DinoImages {
 }
 
 fun DrawScope.drawDino(avatarState: AvatarState, gameTimeTicks: Long) {
-    Log.d("!!!", "drawDino: $avatarState, gwt $gameTimeTicks")
     val flippedBit = gameTimeTicks.toInt() % 2 == 0
     when (val images = DinoImages.imagesFor(avatarState)) {
         is Image.DualFrameImage -> {
