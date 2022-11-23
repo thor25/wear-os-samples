@@ -16,6 +16,8 @@ class DinoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DinoImages.initialize(resources)
+        // [sara] Oops sorry initializing Cactus here, confusingly
+        Cactus.CactusImages.initialize(resources)
         setContent {
             GameWorld()
         }

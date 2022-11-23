@@ -1,6 +1,5 @@
 package com.example.dino.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dino.presentation.GameWorldState.DinoJumpState
@@ -40,10 +39,12 @@ class GameWorldViewModel(
         if (gameWorld.size.width != width || gameWorld.size.height != height) {
             gameWorld.size = UiState.CanvasSize(width, height)
             gameWorld.dinoYPosFeet = gameWorld.size.groundY
+            gameWorld.obstacleOne.xPosLeft = gameWorld.size.width.toFloat()
+            gameWorld.obstacleTwo.xPosLeft = gameWorld.size.width.toFloat() + 100F
         }
     }
 
-    private fun emitUpdatedDinoState() {
+    private fun emitUpdatedState() {
         _uiState.update {
             UiState(
                 gameWorldTicks = gameWorld.gameWorldTicks,
@@ -54,7 +55,11 @@ class GameWorldViewModel(
                     },
                     yPosFeet = gameWorld.dinoYPosFeet
                 ),
-                canvasSize = gameWorld.size
+                canvasSize = gameWorld.size,
+                obstacles = listOf(
+                    gameWorld.obstacleOne.toUIState(),
+                    gameWorld.obstacleTwo.toUIState()
+                )
             )
         }
     }
@@ -79,7 +84,18 @@ class GameWorldViewModel(
             }
         }
 
-        emitUpdatedDinoState()
+        gameWorld.obstacleOne.xPosLeft -= 10
+        gameWorld.obstacleTwo.xPosLeft -= 10
+
+        if (gameWorld.obstacleOne.xPosLeft < 0) {
+            gameWorld.obstacleOne.xPosLeft = gameWorld.size.width.toFloat()
+        }
+
+        if (gameWorld.obstacleTwo.xPosLeft < 0) {
+            gameWorld.obstacleTwo.xPosLeft = gameWorld.size.width.toFloat()
+        }
+
+        emitUpdatedState()
     }
 
     private fun createInitialState(): UiState {
@@ -87,11 +103,19 @@ class GameWorldViewModel(
             0,
             gameWorld.size,
             UiState.Dino(AvatarState.RUNNING, yPosFeet = gameWorld.size.groundY),
-            obstacles = gameWorld.obstacles.map {
-                UiState.Obstacle(
+            obstacles = listOf(
+                gameWorld.obstacleOne.toUIState(),
+                gameWorld.obstacleTwo.toUIState()
+            )
+        )
+    }
 
-                )
-            }
+    private fun GameWorldState.Obstacle.toUIState(): UiState.Obstacle {
+        return UiState.Obstacle(
+            yPosBottom = yPosBottom,
+            xPosLeft = xPosLeft,
+            width = width,
+            height = height
         )
     }
 
@@ -107,7 +131,14 @@ data class GameWorldState(
     var size: UiState.CanvasSize = UiState.CanvasSize(0, 0),
     var dinoYPosFeet: Float = 0f,
     var dinoJumpState: DinoJumpState = DinoJumpState.RUNNING,
-    var obstacles: MutableList<Obstacle> = mutableListOf()
+    var obstacleOne: Obstacle = Obstacle(
+        xPosLeft = size.width.toFloat(),
+        yPosBottom = size.groundY
+    ),
+    var obstacleTwo: Obstacle = Obstacle(
+        xPosLeft = size.width.toFloat() + 100F,
+        yPosBottom = size.groundY
+    ),
 ) {
 
     data class Obstacle(

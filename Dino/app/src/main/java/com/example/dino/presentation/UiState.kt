@@ -18,6 +18,7 @@ data class UiState(
 
     data class Obstacle(
         val yPosBottom: Float,
+        val xPosLeft: Float,
         val width: Int,
         val height: Int
     )

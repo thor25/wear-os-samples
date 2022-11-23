@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 private const val DINO_WIDTH = 86
 private const val DINO_HEIGHT = 97
+private const val CACTUS_HEIGHT = 75
 
 @ExperimentalLifecycleComposeApi
 @Composable
@@ -22,7 +23,7 @@ fun GameWorld(
 ) {
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val (gameWorldTicks, canvasSize, dino) = uiState.value
+    val (gameWorldTicks, canvasSize, dino, obstacles) = uiState.value
     Canvas(
         modifier = Modifier
             .fillMaxSize()
@@ -36,7 +37,15 @@ fun GameWorld(
                 }
             },
         onDraw = {
-            // TODO: draw obstacles
+            for (obstacle in obstacles) {
+                // TODO: draw obstacles
+                translate(
+                    left = obstacle.xPosLeft,
+                    top = obstacle.yPosBottom - CACTUS_HEIGHT
+                ) {
+                    drawCactus()
+                }
+            }
 
             translate(
                 left = DINO_WIDTH * 0.5f,
