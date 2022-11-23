@@ -1,6 +1,7 @@
 package com.example.dino.presentation
 
 import android.content.res.Resources
+import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.imageResource
@@ -45,10 +46,12 @@ object DinoImages {
     }
 }
 
-fun DrawScope.drawDino(avatarState: AvatarState, frameTimeMillis: Float) {
+fun DrawScope.drawDino(avatarState: AvatarState, gameTimeTicks: Long) {
+    Log.d("!!!", "drawDino: $avatarState, gwt $gameTimeTicks")
+    val flippedBit = gameTimeTicks.toInt() % 2 == 0
     when (val images = DinoImages.imagesFor(avatarState)) {
         is Image.DualFrameImage -> {
-            if (frameTimeMillis.toInt() % 2 == 0) {
+            if (flippedBit) {
                 drawImage(images.frameOne)
             } else {
                 drawImage(images.frameTwo)
@@ -56,72 +59,6 @@ fun DrawScope.drawDino(avatarState: AvatarState, frameTimeMillis: Float) {
         }
         is Image.SingleFrameImage -> drawImage(images.frame)
     }
-
-//    val images = mapDino[dinoState.value]
-//    if (images!!.size > 1) {
-//        if (flippedBit) {
-//    drawImage(ImageBitmap.imageResource(resources, id = R.drawable.chrome_dino_waiting))
-//        } else {
-//            drawImage(images[1])
-//        }
-//    } else {
-//        drawImage(images[0])
-//    }
-//    val dinoState = remember {
-//        mutableStateOf(TRexAnim.WAITING)
-//    }
-//
-//    val time by produceState(0f) {
-//        while (true) {
-//            withInfiniteAnimationFrameMillis {
-//                value = it.toFloat() * 0.5f
-//            }
-//        }
-//    }
-//    val flippedBit by remember {
-//        derivedStateOf {
-//            time % 2 == 0f
-//        }
-//    }
-//    val gameStarted = remember {
-//        mutableStateOf(false)
-//    }
-//    val mapDino: MutableMap<TRexAnim, List<ImageBitmap>> = mutableMapOf()
-//    TRexAnim.values().forEach {
-//        val listImages = it.listImages.map { imageRes ->
-//            ImageBitmap.imageResource(id = imageRes)
-//        }
-//        mapDino[it] = listImages
-//    }
-//
-//    Canvas(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(32.dp)
-//            .pointerInput("dino") {
-//                detectTapGestures {
-//                    if (!gameStarted.value) {
-//                        gameStarted.value = true
-//                        dinoState.value = TRexAnim.RUNNING
-//                    } else {
-//                        dinoState.value = TRexAnim.JUMPING
-//                    }
-//                }
-//            },
-//        onDraw = {
-//            val images = mapDino[dinoState.value]
-//            if (images!!.size > 1) {
-//                if (flippedBit) {
-//                    drawImage(images[0])
-//                } else {
-//                    drawImage(images[1])
-//                }
-//            } else {
-//                drawImage(images[0])
-//            }
-//
-//        }
-//    )
 }
 
 enum class AvatarState {
