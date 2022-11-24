@@ -2,6 +2,7 @@ package com.example.dino.presentation
 
 import android.graphics.Rect
 import android.graphics.Rect.intersects
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dino.presentation.GameWorldState.DinoState
@@ -22,7 +23,7 @@ private const val JUMP_SPEED = 20
 private const val FALL_SPEED = 15
 private const val OBSTACLE_SPEED = 15
 private const val OBSTACLE_DIST_MIN = 40
-private const val OBSTACLE_DIST_MAX = 200
+private const val OBSTACLE_DIST_MAX = 400
 private const val DINO_WIDTH = 24
 private const val DINO_HEIGHT = 32
 private const val CACTUS_WIDTH = 75
@@ -60,12 +61,13 @@ class GameWorldViewModel(
     }
 
     private fun reset() {
+        gameWorld.gameWorldTicks = 0
         gameWorld.dinoState = RUNNING
         gameWorld.dinoLeft = DINO_WIDTH * 1.5f
         gameWorld.dinoTop = gameWorld.size.groundY - DINO_HEIGHT
         gameWorld.obstacleOne.left = gameWorld.size.width
         gameWorld.obstacleOne.top = gameWorld.size.groundY - CACTUS_HEIGHT
-        gameWorld.obstacleTwo.left = gameWorld.size.width + 100F
+        gameWorld.obstacleTwo.left = gameWorld.size.width + generateObstacleDistance()
         gameWorld.obstacleTwo.top = gameWorld.size.groundY - CACTUS_HEIGHT
     }
 
@@ -121,6 +123,9 @@ class GameWorldViewModel(
                 obstacleTwoRectangle
             )
         ) {
+            if (gameWorld.isPlaying) {
+                gameWorld.score = (gameWorld.gameWorldTicks / 12).toInt()
+            }
             gameWorld.isPlaying = false
             gameWorld.dinoState = CRASHED
         }
@@ -171,8 +176,9 @@ class GameWorldViewModel(
         }
     }
 
-    fun generateObstacleDistance(): Float {
+    private fun generateObstacleDistance(): Float {
         val distance = (OBSTACLE_DIST_MIN..OBSTACLE_DIST_MAX).random().toFloat()
+        Log.d("!!!", "distance $distance")
         return distance
     }
 
@@ -186,11 +192,9 @@ data class GameWorldState(
     var dinoState: DinoState = RUNNING,
     var obstacleOne: Obstacle = Obstacle(0f, 0f),
     var obstacleTwo: Obstacle = Obstacle(0f, 0f),
-    var isPlaying: Boolean = false
+    var isPlaying: Boolean = false,
+    var score: Int = 0
 ) {
-
-    val score
-        get() = gameWorldTicks / 24
 
     data class CanvasSize(val width: Float, val height: Float) {
         val groundY: Float
