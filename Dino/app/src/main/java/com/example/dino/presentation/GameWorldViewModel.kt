@@ -112,7 +112,8 @@ class GameWorldViewModel(
                             GameWorldState.CloudType.THREE -> CloudType.CLOUD_THREE
                         }
                     )
-                }
+                },
+                groundY = gameWorld.size.groundY
             )
         }
     }

@@ -22,11 +22,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,6 +75,11 @@ fun GameWorld(
             val uiStateValue = uiState.value
 
             if (uiStateValue != null) {
+                drawRect(
+                    color = Color(51, 205, 53),
+                    topLeft = Offset(0f, uiStateValue.groundY),
+                )
+
                 for (cloud in uiStateValue.clouds) {
                     translate(left = cloud.left, top = cloud.top) {
                         Log.d("!!!", "cloud L ${cloud.left} T ${cloud.top}")

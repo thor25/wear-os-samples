@@ -6,7 +6,8 @@ data class UiState(
     val dino: Dino,
     val obstacles: List<Obstacle>,
     val clouds: List<Cloud>,
-    val isPlaying: Boolean
+    val isPlaying: Boolean,
+    val groundY: Float
 ) {
     data class Dino(
         val avatarState: AvatarState,
