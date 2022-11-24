@@ -2,8 +2,10 @@ package com.example.dino.presentation
 
 data class UiState(
     val gameWorldTicks: Long,
+    val score: Int,
     val dino: Dino,
-    val obstacles: List<Obstacle>
+    val obstacles: List<Obstacle>,
+    val isPlaying: Boolean
 ) {
     data class Dino(
         val avatarState: AvatarState,

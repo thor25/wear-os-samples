@@ -15,24 +15,29 @@ sealed interface Image {
 object DinoImages {
     private lateinit var waiting: Image
     private lateinit var running: Image
+    private lateinit var jumping: Image
     private lateinit var crashed: Image
 
     fun initialize(resources: Resources) {
         waiting = Image.SingleFrameImage(
             ImageBitmap.imageResource(
                 resources,
-                R.drawable.chrome_dino_waiting
+                R.drawable.waiting
             )
         )
         running = Image.DualFrameImage(
-            ImageBitmap.imageResource(resources, R.drawable.chrome_dino_walk_1),
-            ImageBitmap.imageResource(resources, R.drawable.chrome_dino_walk_2)
+            ImageBitmap.imageResource(resources, R.drawable.walk_one),
+            ImageBitmap.imageResource(resources, R.drawable.walk_two)
         )
         crashed = Image.SingleFrameImage(
             ImageBitmap.imageResource(
                 resources,
-                R.drawable.chrome_dino_closed_eyes
+                R.drawable.dead
             )
+        )
+        jumping = Image.DualFrameImage(
+            ImageBitmap.imageResource(resources, R.drawable.fly_one),
+            ImageBitmap.imageResource(resources, R.drawable.fly_two)
         )
     }
 
@@ -40,8 +45,8 @@ object DinoImages {
         return when (avatarState) {
             AvatarState.RUNNING -> running
             AvatarState.CRASHED -> crashed
-            AvatarState.WAITING,
-            AvatarState.JUMPING -> waiting
+            AvatarState.WAITING -> waiting
+            AvatarState.JUMPING -> jumping
         }
     }
 }
