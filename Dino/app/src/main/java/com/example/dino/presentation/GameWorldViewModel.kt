@@ -20,9 +20,10 @@ import java.util.Random
 
 private const val MILLIS_PER_FRAME_24FPS = (1000 / 24).toLong()
 private const val JUMP_SPEED = 20
+private const val FALL_SPEED = 15
 private const val OBSTACLE_SPEED = 15
 private const val OBSTACLE_DIST_MIN = 40
-private const val OBSTACLE_DIST_MAX = 300
+private const val OBSTACLE_DIST_MAX = 200
 private const val DINO_WIDTH = 86
 private const val DINO_HEIGHT = 97
 private const val CACTUS_WIDTH = 75
@@ -116,7 +117,7 @@ class GameWorldViewModel(
         }
         if (gameWorld.dinoJumpState == FALLING) {
             if (gameWorld.dinoTop <= gameWorld.size.groundY - DINO_HEIGHT) {
-                gameWorld.dinoTop += JUMP_SPEED
+                gameWorld.dinoTop += FALL_SPEED
             } else {
                 gameWorld.dinoTop = gameWorld.size.groundY - DINO_HEIGHT
                 gameWorld.dinoJumpState = DinoJumpState.RUNNING
