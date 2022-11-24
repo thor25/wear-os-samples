@@ -176,6 +176,7 @@ class GameWorldViewModel(
             type = when (type) {
                 GameWorldState.DessertType.CAKE -> DessertType.CAKE
                 GameWorldState.DessertType.DONUT -> DessertType.DONUT
+                GameWorldState.DessertType.SUNDAE -> DessertType.SUNDAE
             }
         )
     }
@@ -226,6 +227,7 @@ data class GameWorldState(
 
     enum class DessertType {
         CAKE,
-        DONUT
+        DONUT,
+        SUNDAE
     }
 }
