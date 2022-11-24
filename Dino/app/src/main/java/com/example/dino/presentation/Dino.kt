@@ -1,7 +1,6 @@
 package com.example.dino.presentation
 
 import android.content.res.Resources
-import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.imageResource

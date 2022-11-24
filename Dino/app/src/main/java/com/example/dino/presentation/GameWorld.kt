@@ -69,7 +69,7 @@ fun GameWorld(
             if (uiStateValue != null) {
                 for (obstacle in uiStateValue.obstacles) {
                     translate(left = obstacle.left, top = obstacle.top) {
-                        drawCactus()
+                        drawDessert(obstacle.type)
                     }
                 }
 

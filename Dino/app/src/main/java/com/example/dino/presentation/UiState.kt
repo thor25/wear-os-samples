@@ -15,6 +15,7 @@ data class UiState(
 
     data class Obstacle(
         val top: Float,
-        val left: Float
+        val left: Float,
+        val type: DessertType
     )
 }

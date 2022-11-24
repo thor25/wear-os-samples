@@ -16,7 +16,7 @@ class DinoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DinoImages.initialize(resources)
-        Cactus.CactusImages.initialize(resources)
+        DessertImages.initialize(resources)
         setContent {
             GameWorld()
         }

@@ -5,10 +5,12 @@ import android.graphics.Rect.intersects
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dino.presentation.GameWorldState.CanvasSize
 import com.example.dino.presentation.GameWorldState.DinoState.CRASHED
 import com.example.dino.presentation.GameWorldState.DinoState.FALLING
 import com.example.dino.presentation.GameWorldState.DinoState.JUMPING
 import com.example.dino.presentation.GameWorldState.DinoState.RUNNING
+import com.example.dino.presentation.GameWorldState.Obstacle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,18 +18,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
+import kotlin.random.Random
 
 private const val MILLIS_PER_FRAME_24FPS = (1000 / 24).toLong()
-private const val JUMP_SPEED = 25
+private const val JUMP_SPEED = 30
 private const val FALL_SPEED = 20
 private const val DINO_WIDTH = 48
 private const val DINO_HEIGHT = 64
 private const val OBSTACLE_SPEED = 15
 private const val OBSTACLE_DIST_MIN = 600
 private const val OBSTACLE_DIST_MAX = 1000
-private const val CACTUS_WIDTH = 75
-private const val CACTUS_HEIGHT = 75
-private const val JUMP_HEIGHT = DINO_HEIGHT * 2.5f
+private const val CACTUS_WIDTH = 48
+private const val CACTUS_HEIGHT = 48
+private const val JUMP_HEIGHT = DINO_HEIGHT * 2.2f
 
 class GameWorldViewModel(
     private val gameWorld: GameWorldState = GameWorldState()
@@ -54,7 +57,7 @@ class GameWorldViewModel(
 
     fun onCanvasResize(width: Int, height: Int) {
         if (gameWorld.size.width != width.toFloat() || gameWorld.size.height != height.toFloat()) {
-            gameWorld.size = GameWorldState.CanvasSize(width.toFloat(), height.toFloat())
+            gameWorld.size = CanvasSize(width.toFloat(), height.toFloat())
             reset()
         }
     }
@@ -150,22 +153,30 @@ class GameWorldViewModel(
             if (gameWorld.obstacleOne.left < 0 - CACTUS_WIDTH) {
                 gameWorld.obstacleOne.left =
                     (gameWorld.size.width + generateObstacleDistance())
+                gameWorld.obstacleOne.type =
+                    GameWorldState.DessertType.values()[Random.nextInt(DessertType.values().size)]
             }
 
             gameWorld.obstacleTwo.left -= OBSTACLE_SPEED
             if (gameWorld.obstacleTwo.left < 0 - CACTUS_WIDTH) {
                 gameWorld.obstacleTwo.left =
                     (gameWorld.size.width + generateObstacleDistance())
+                gameWorld.obstacleTwo.type =
+                    GameWorldState.DessertType.values()[Random.nextInt(DessertType.values().size)]
             }
         }
 
         emitUpdatedState()
     }
 
-    private fun GameWorldState.Obstacle.toUiState(): UiState.Obstacle {
+    private fun Obstacle.toUiState(): UiState.Obstacle {
         return UiState.Obstacle(
             top = top,
-            left = left
+            left = left,
+            type = when (type) {
+                GameWorldState.DessertType.CAKE -> DessertType.CAKE
+                GameWorldState.DessertType.DONUT -> DessertType.DONUT
+            }
         )
     }
 
@@ -189,8 +200,8 @@ data class GameWorldState(
     var dinoLeft: Float = 0f,
     var dinoTop: Float = 0f,
     var dinoState: DinoState = RUNNING,
-    var obstacleOne: Obstacle = Obstacle(0f, 0f),
-    var obstacleTwo: Obstacle = Obstacle(0f, 0f),
+    var obstacleOne: Obstacle = Obstacle(0f, 0f, DessertType.CAKE),
+    var obstacleTwo: Obstacle = Obstacle(0f, 0f, DessertType.DONUT),
     var isPlaying: Boolean = false,
     var score: Int = 0
 ) {
@@ -202,7 +213,8 @@ data class GameWorldState(
 
     data class Obstacle(
         var left: Float,
-        var top: Float
+        var top: Float,
+        var type: DessertType
     )
 
     enum class DinoState {
@@ -210,5 +222,10 @@ data class GameWorldState(
         FALLING,
         RUNNING,
         CRASHED
+    }
+
+    enum class DessertType {
+        CAKE,
+        DONUT
     }
 }
