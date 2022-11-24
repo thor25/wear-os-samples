@@ -5,7 +5,6 @@ import android.graphics.Rect.intersects
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.dino.presentation.GameWorldState.DinoState
 import com.example.dino.presentation.GameWorldState.DinoState.CRASHED
 import com.example.dino.presentation.GameWorldState.DinoState.FALLING
 import com.example.dino.presentation.GameWorldState.DinoState.JUMPING
@@ -19,16 +18,16 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 
 private const val MILLIS_PER_FRAME_24FPS = (1000 / 24).toLong()
-private const val JUMP_SPEED = 20
-private const val FALL_SPEED = 15
+private const val JUMP_SPEED = 25
+private const val FALL_SPEED = 20
 private const val OBSTACLE_SPEED = 15
 private const val OBSTACLE_DIST_MIN = 40
 private const val OBSTACLE_DIST_MAX = 400
-private const val DINO_WIDTH = 24
-private const val DINO_HEIGHT = 32
+private const val DINO_WIDTH = 48
+private const val DINO_HEIGHT = 64
 private const val CACTUS_WIDTH = 75
 private const val CACTUS_HEIGHT = 75
-private const val JUMP_HEIGHT = DINO_HEIGHT * 4f
+private const val JUMP_HEIGHT = DINO_HEIGHT * 2.5f
 
 class GameWorldViewModel(
     private val gameWorld: GameWorldState = GameWorldState()
