@@ -2,11 +2,14 @@
 
 package com.example.dino.presentation
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -19,6 +22,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
@@ -28,6 +32,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.Chip
+import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
 import kotlinx.coroutines.launch
@@ -47,6 +52,7 @@ fun GameWorld(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(51, 195, 255))
                 .onSizeChanged {
                     viewModel.onCanvasResize(it.width, it.height)
                 }
@@ -67,6 +73,13 @@ fun GameWorld(
             val uiStateValue = uiState.value
 
             if (uiStateValue != null) {
+                for (cloud in uiStateValue.clouds) {
+                    translate(left = cloud.left, top = cloud.top) {
+                        Log.d("!!!", "cloud L ${cloud.left} T ${cloud.top}")
+                        drawCloud(cloud.type)
+                    }
+                }
+
                 for (obstacle in uiStateValue.obstacles) {
                     translate(left = obstacle.left, top = obstacle.top) {
                         drawDessert(obstacle.type)
@@ -86,10 +99,22 @@ fun GameWorld(
                         contentDescription = "play game"
                     )
                 },
-                modifier = Modifier.padding(16.dp),
+                colors = ChipDefaults.primaryChipColors(
+                    backgroundColor = Color(255, 214, 51),
+                    contentColor = Color(65, 65, 65),
+                    secondaryContentColor = Color(65, 65, 65),
+                    iconColor = Color(65, 65, 65)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 label = { Text("Play") },
                 secondaryLabel = uiState.value?.score?.let { score ->
-                    { Text("score: ${score}") }
+                    if (score > 0) {
+                        { Text("Score: $score") }
+                    } else {
+                        null
+                    }
                 },
                 onClick = { viewModel.onStartPressed() }
             )

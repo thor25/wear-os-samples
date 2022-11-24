@@ -2,7 +2,6 @@ package com.example.dino.presentation
 
 import android.graphics.Rect
 import android.graphics.Rect.intersects
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dino.presentation.GameWorldState.CanvasSize
@@ -30,6 +29,11 @@ private const val OBSTACLE_DIST_MIN = 600
 private const val OBSTACLE_DIST_MAX = 1000
 private const val OBSTACLE_WIDTH = 48
 private const val OBSTACLE_HEIGHT = 48
+private const val CLOUD_DIST_MIN = 0
+private const val CLOUD_DIST_MAX = 600
+private const val CLOUD_WIDTH = 64
+private const val CLOUD_SPEED_MIN = 2
+private const val CLOUD_SPEED_MAX = 8
 private const val JUMP_HEIGHT = DINO_HEIGHT * 2.2f
 
 class GameWorldViewModel(
@@ -69,8 +73,14 @@ class GameWorldViewModel(
         gameWorld.dinoTop = gameWorld.size.groundY - DINO_HEIGHT
         gameWorld.obstacleOne.left = gameWorld.size.width
         gameWorld.obstacleOne.top = gameWorld.size.groundY - OBSTACLE_HEIGHT
-        gameWorld.obstacleTwo.left = gameWorld.size.width + generateObstacleDistance()
+        gameWorld.obstacleTwo.left = gameWorld.size.width + generateRandomOffsetDistance()
         gameWorld.obstacleTwo.top = gameWorld.size.groundY - OBSTACLE_HEIGHT
+        gameWorld.clouds.forEach { cloud ->
+            cloud.type = GameWorldState.CloudType.values()[Random.nextInt(CloudType.values().size)]
+            cloud.left = gameWorld.size.width + generateRandomCloudOffsetDistance()
+            cloud.top = generateRandomCloudPosition()
+            cloud.speed = generateRandomCloudSpeed()
+        }
     }
 
     private fun emitUpdatedState() {
@@ -91,7 +101,18 @@ class GameWorldViewModel(
                     gameWorld.obstacleOne.toUiState(),
                     gameWorld.obstacleTwo.toUiState()
                 ),
-                isPlaying = gameWorld.isPlaying
+                isPlaying = gameWorld.isPlaying,
+                clouds = gameWorld.clouds.map { cloud ->
+                    UiState.Cloud(
+                        left = cloud.left,
+                        top = cloud.top,
+                        type = when (cloud.type) {
+                            GameWorldState.CloudType.ONE -> CloudType.CLOUD_ONE
+                            GameWorldState.CloudType.TWO -> CloudType.CLOUD_TWO
+                            GameWorldState.CloudType.THREE -> CloudType.CLOUD_THREE
+                        }
+                    )
+                }
             )
         }
     }
@@ -102,6 +123,17 @@ class GameWorldViewModel(
 
     private fun onGameLoop() {
         gameWorld.gameWorldTicks++
+
+        gameWorld.clouds.forEach { cloud ->
+            if (cloud.left < 0 - CLOUD_WIDTH) {
+                cloud.type = GameWorldState.CloudType.values()[Random.nextInt(CloudType.values().size)]
+                cloud.left = gameWorld.size.width + generateRandomCloudOffsetDistance()
+                cloud.top = generateRandomCloudPosition()
+                cloud.speed = generateRandomCloudSpeed()
+            } else {
+                cloud.left -= cloud.speed
+            }
+        }
 
         // TODO move this to a nicer spot, make less redundant
         dinoRectangle.left = gameWorld.dinoLeft.toInt()
@@ -152,7 +184,7 @@ class GameWorldViewModel(
             gameWorld.obstacleOne.left -= OBSTACLE_SPEED
             if (gameWorld.obstacleOne.left < 0 - OBSTACLE_WIDTH) {
                 gameWorld.obstacleOne.left =
-                    (gameWorld.size.width + generateObstacleDistance())
+                    (gameWorld.size.width + generateRandomOffsetDistance())
                 gameWorld.obstacleOne.type =
                     GameWorldState.DessertType.values()[Random.nextInt(DessertType.values().size)]
             }
@@ -160,7 +192,7 @@ class GameWorldViewModel(
             gameWorld.obstacleTwo.left -= OBSTACLE_SPEED
             if (gameWorld.obstacleTwo.left < 0 - OBSTACLE_WIDTH) {
                 gameWorld.obstacleTwo.left =
-                    (gameWorld.size.width + generateObstacleDistance())
+                    (gameWorld.size.width + generateRandomOffsetDistance())
                 gameWorld.obstacleTwo.type =
                     GameWorldState.DessertType.values()[Random.nextInt(DessertType.values().size)]
             }
@@ -187,12 +219,21 @@ class GameWorldViewModel(
         }
     }
 
-    private fun generateObstacleDistance(): Float {
-        val distance = (OBSTACLE_DIST_MIN..OBSTACLE_DIST_MAX).random().toFloat()
-        Log.d("!!!", "distance $distance")
-        return distance
+    private fun generateRandomOffsetDistance(): Float {
+        return (OBSTACLE_DIST_MIN..OBSTACLE_DIST_MAX).random().toFloat()
     }
 
+    private fun generateRandomCloudOffsetDistance(): Float {
+        return (CLOUD_DIST_MIN..CLOUD_DIST_MAX).random().toFloat()
+    }
+
+    private fun generateRandomCloudPosition(): Float {
+        return (0..gameWorld.size.groundY.toInt() - 100).random().toFloat()
+    }
+
+    private fun generateRandomCloudSpeed(): Float {
+        return (CLOUD_SPEED_MIN..CLOUD_SPEED_MAX).random().toFloat()
+    }
 }
 
 data class GameWorldState(
@@ -204,18 +245,29 @@ data class GameWorldState(
     var obstacleOne: Obstacle = Obstacle(0f, 0f, DessertType.CAKE),
     var obstacleTwo: Obstacle = Obstacle(0f, 0f, DessertType.DONUT),
     var isPlaying: Boolean = false,
-    var score: Int = 0
+    var score: Int = 0,
+    val clouds: List<Cloud> = listOf(
+        Cloud(0f, 0f, CloudType.ONE, 0f),
+        Cloud(0f, 0f, CloudType.ONE, 0f),
+    )
 ) {
 
     data class CanvasSize(val width: Float, val height: Float) {
         val groundY: Float
-            get() = height * .75f
+            get() = height * .85f
     }
 
     data class Obstacle(
         var left: Float,
         var top: Float,
         var type: DessertType
+    )
+
+    data class Cloud(
+        var left: Float,
+        var top: Float,
+        var type: CloudType,
+        var speed: Float
     )
 
     enum class DinoState {
@@ -229,5 +281,11 @@ data class GameWorldState(
         CAKE,
         DONUT,
         SUNDAE
+    }
+
+    enum class CloudType {
+        ONE,
+        TWO,
+        THREE
     }
 }

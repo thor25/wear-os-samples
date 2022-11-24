@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 class DinoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CloudImages.initialize(resources)
         DinoImages.initialize(resources)
         DessertImages.initialize(resources)
         setContent {

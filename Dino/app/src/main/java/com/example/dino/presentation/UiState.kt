@@ -5,6 +5,7 @@ data class UiState(
     val score: Int,
     val dino: Dino,
     val obstacles: List<Obstacle>,
+    val clouds: List<Cloud>,
     val isPlaying: Boolean
 ) {
     data class Dino(
@@ -17,5 +18,11 @@ data class UiState(
         val top: Float,
         val left: Float,
         val type: DessertType
+    )
+
+    data class Cloud(
+        val top: Float,
+        val left: Float,
+        val type: CloudType
     )
 }
