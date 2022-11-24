@@ -1,5 +1,9 @@
 package com.example.dino.presentation
 
+import android.graphics.Rect
+import android.graphics.Rect.intersects
+import android.util.Log
+import androidx.compose.ui.graphics.Outline
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dino.presentation.GameWorldState.DinoJumpState
@@ -12,10 +16,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
+import java.util.Random
 
 private const val MILLIS_PER_FRAME_24FPS = (1000 / 24).toLong()
 private const val JUMP_SPEED = 20
 private const val OBSTACLE_SPEED = 15
+private const val OBSTACLE_DIST_MIN = 40
+private const val OBSTACLE_DIST_MAX = 300
 private const val DINO_WIDTH = 86
 private const val DINO_HEIGHT = 97
 private const val CACTUS_WIDTH = 75
@@ -75,6 +82,31 @@ class GameWorldViewModel(
     private fun onGameLoop() {
         gameWorld.gameWorldTicks++
 
+        // TODO move this to a nicer spot, make less redundant
+        var dinoRectangle = Rect()
+        dinoRectangle.left = gameWorld.dinoLeft.toInt()
+        dinoRectangle.top = gameWorld.dinoTop.toInt()
+        dinoRectangle. right = (gameWorld.dinoLeft + DINO_WIDTH).toInt()
+        dinoRectangle.bottom = (gameWorld.dinoTop + DINO_HEIGHT).toInt()
+
+        var obstacleOneRectangle = Rect()
+        obstacleOneRectangle.left = gameWorld.obstacleOne.left.toInt()
+        obstacleOneRectangle.top = gameWorld.obstacleOne.top.toInt()
+        obstacleOneRectangle. right = (gameWorld.obstacleOne.left + CACTUS_WIDTH).toInt()
+        obstacleOneRectangle.bottom = (gameWorld.obstacleOne.top + CACTUS_HEIGHT).toInt()
+
+        var obstacleTwoRectangle = Rect()
+        obstacleTwoRectangle.left = gameWorld.obstacleTwo.left.toInt()
+        obstacleTwoRectangle.top = gameWorld.obstacleTwo.top.toInt()
+        obstacleTwoRectangle. right = (gameWorld.obstacleTwo.left + CACTUS_WIDTH).toInt()
+        obstacleTwoRectangle.bottom = (gameWorld.obstacleTwo.top + CACTUS_HEIGHT).toInt()
+
+        // Check for collisions
+        if (intersects(dinoRectangle, obstacleOneRectangle) || intersects(dinoRectangle, obstacleTwoRectangle)) {
+            var score: Long = gameWorld.gameWorldTicks/24
+            Log.d("!!!!", "Collision! Score: ${score}")
+        }
+
         if (gameWorld.dinoJumpState == JUMPING) {
             if (gameWorld.dinoTop >= gameWorld.size.groundY - DINO_HEIGHT - JUMP_HEIGHT) {
                 gameWorld.dinoTop -= JUMP_SPEED
@@ -93,12 +125,12 @@ class GameWorldViewModel(
 
         gameWorld.obstacleOne.left -= OBSTACLE_SPEED
         if (gameWorld.obstacleOne.left < 0 - CACTUS_WIDTH) {
-            gameWorld.obstacleOne.left = gameWorld.size.width.toFloat()
+            gameWorld.obstacleOne.left = (gameWorld.size.width.toFloat() + generateObstacleDistance())
         }
 
         gameWorld.obstacleTwo.left -= OBSTACLE_SPEED
         if (gameWorld.obstacleTwo.left < 0 - CACTUS_WIDTH) {
-            gameWorld.obstacleTwo.left = gameWorld.size.width.toFloat()
+            gameWorld.obstacleTwo.left = (gameWorld.size.width.toFloat() + generateObstacleDistance())
         }
 
         emitUpdatedState()
@@ -116,6 +148,12 @@ class GameWorldViewModel(
             gameWorld.dinoJumpState = JUMPING
         }
     }
+
+    fun generateObstacleDistance(): Float {
+        val distance = (OBSTACLE_DIST_MIN..OBSTACLE_DIST_MAX).random().toFloat()
+        return distance
+    }
+
 }
 
 data class GameWorldState(
