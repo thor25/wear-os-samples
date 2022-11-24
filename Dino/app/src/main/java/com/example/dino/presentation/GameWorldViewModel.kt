@@ -20,11 +20,11 @@ import kotlinx.coroutines.flow.update
 private const val MILLIS_PER_FRAME_24FPS = (1000 / 24).toLong()
 private const val JUMP_SPEED = 25
 private const val FALL_SPEED = 20
-private const val OBSTACLE_SPEED = 15
-private const val OBSTACLE_DIST_MIN = 40
-private const val OBSTACLE_DIST_MAX = 400
 private const val DINO_WIDTH = 48
 private const val DINO_HEIGHT = 64
+private const val OBSTACLE_SPEED = 15
+private const val OBSTACLE_DIST_MIN = 600
+private const val OBSTACLE_DIST_MAX = 1000
 private const val CACTUS_WIDTH = 75
 private const val CACTUS_HEIGHT = 75
 private const val JUMP_HEIGHT = DINO_HEIGHT * 2.5f
