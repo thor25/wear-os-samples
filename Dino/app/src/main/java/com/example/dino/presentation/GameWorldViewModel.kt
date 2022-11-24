@@ -28,8 +28,8 @@ private const val DINO_HEIGHT = 64
 private const val OBSTACLE_SPEED = 15
 private const val OBSTACLE_DIST_MIN = 600
 private const val OBSTACLE_DIST_MAX = 1000
-private const val CACTUS_WIDTH = 48
-private const val CACTUS_HEIGHT = 48
+private const val OBSTACLE_WIDTH = 48
+private const val OBSTACLE_HEIGHT = 48
 private const val JUMP_HEIGHT = DINO_HEIGHT * 2.2f
 
 class GameWorldViewModel(
@@ -68,9 +68,9 @@ class GameWorldViewModel(
         gameWorld.dinoLeft = DINO_WIDTH * 1.5f
         gameWorld.dinoTop = gameWorld.size.groundY - DINO_HEIGHT
         gameWorld.obstacleOne.left = gameWorld.size.width
-        gameWorld.obstacleOne.top = gameWorld.size.groundY - CACTUS_HEIGHT
+        gameWorld.obstacleOne.top = gameWorld.size.groundY - OBSTACLE_HEIGHT
         gameWorld.obstacleTwo.left = gameWorld.size.width + generateObstacleDistance()
-        gameWorld.obstacleTwo.top = gameWorld.size.groundY - CACTUS_HEIGHT
+        gameWorld.obstacleTwo.top = gameWorld.size.groundY - OBSTACLE_HEIGHT
     }
 
     private fun emitUpdatedState() {
@@ -111,13 +111,13 @@ class GameWorldViewModel(
 
         obstacleOneRectangle.left = gameWorld.obstacleOne.left.toInt()
         obstacleOneRectangle.top = gameWorld.obstacleOne.top.toInt()
-        obstacleOneRectangle.right = (gameWorld.obstacleOne.left + CACTUS_WIDTH).toInt()
-        obstacleOneRectangle.bottom = (gameWorld.obstacleOne.top + CACTUS_HEIGHT).toInt()
+        obstacleOneRectangle.right = (gameWorld.obstacleOne.left + OBSTACLE_WIDTH).toInt()
+        obstacleOneRectangle.bottom = (gameWorld.obstacleOne.top + OBSTACLE_HEIGHT).toInt()
 
         obstacleTwoRectangle.left = gameWorld.obstacleTwo.left.toInt()
         obstacleTwoRectangle.top = gameWorld.obstacleTwo.top.toInt()
-        obstacleTwoRectangle.right = (gameWorld.obstacleTwo.left + CACTUS_WIDTH).toInt()
-        obstacleTwoRectangle.bottom = (gameWorld.obstacleTwo.top + CACTUS_HEIGHT).toInt()
+        obstacleTwoRectangle.right = (gameWorld.obstacleTwo.left + OBSTACLE_WIDTH).toInt()
+        obstacleTwoRectangle.bottom = (gameWorld.obstacleTwo.top + OBSTACLE_HEIGHT).toInt()
 
         // Check for collisions
         if (intersects(dinoRectangle, obstacleOneRectangle) || intersects(
@@ -150,7 +150,7 @@ class GameWorldViewModel(
 
         if (gameWorld.isPlaying) {
             gameWorld.obstacleOne.left -= OBSTACLE_SPEED
-            if (gameWorld.obstacleOne.left < 0 - CACTUS_WIDTH) {
+            if (gameWorld.obstacleOne.left < 0 - OBSTACLE_WIDTH) {
                 gameWorld.obstacleOne.left =
                     (gameWorld.size.width + generateObstacleDistance())
                 gameWorld.obstacleOne.type =
@@ -158,7 +158,7 @@ class GameWorldViewModel(
             }
 
             gameWorld.obstacleTwo.left -= OBSTACLE_SPEED
-            if (gameWorld.obstacleTwo.left < 0 - CACTUS_WIDTH) {
+            if (gameWorld.obstacleTwo.left < 0 - OBSTACLE_WIDTH) {
                 gameWorld.obstacleTwo.left =
                     (gameWorld.size.width + generateObstacleDistance())
                 gameWorld.obstacleTwo.type =
