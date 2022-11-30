@@ -7,48 +7,86 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PointMode
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @ExperimentalComposeUiApi
 @Composable
 fun SpaceCanvas(
+    modifier: Modifier = Modifier,
+    viewModel: GameEngineViewModel = viewModel()
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    Log.d("!!!", "  uiState $uiState")
+    SpaceCanvas(
+        spaceship = uiState.value.spaceship,
+        onTap = { viewModel.onTap() },
+        onRotate = { viewModel.onRotate(it) },
+        modifier = modifier.onSizeChanged(viewModel::onCanvasSizeChange)
+    )
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun SpaceCanvas(
+    spaceship: GameState.Spaceship,
+    onTap: () -> Unit,
+    onRotate: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
-    var rotation by remember { mutableStateOf(0f) }
-    var center by remember { mutableStateOf(Offset(0f, 0f)) }
     Canvas(
         modifier = modifier
             .fillMaxSize()
-            .onSizeChanged {
-                center = Offset(it.width * 0.5f, it.height * 0.5f)
-            }
             .pointerInput("screen_taps") {
-                detectTapGestures {
-                    Log.d("!!!", "tap")
-                }
+                detectTapGestures { onTap() }
             }
             .onRotaryScrollEvent {
-                rotation += it.verticalScrollPixels
+                onRotate(it.verticalScrollPixels)
                 true
             }
             .focusRequester(focusRequester)
             .focusable(true)
     ) {
-        draw(Spaceship(center.x, center.y, rotation))
+        draw(spaceship)
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+}
+
+private fun DrawScope.draw(spaceship: GameState.Spaceship) {
+    val tip = Offset(spaceship.positionX, spaceship.positionY - 0.7f * spaceship.length)
+    val backLeft = Offset(
+        spaceship.positionX - 0.5f * spaceship.width,
+        spaceship.positionY + 0.3f * spaceship.length
+    )
+    val backRight = Offset(
+        spaceship.positionX + 0.5f * spaceship.width,
+        spaceship.positionY + 0.3f * spaceship.length
+    )
+
+    rotate(
+        degrees = spaceship.rotationDegrees,
+        pivot = Offset(spaceship.positionX, spaceship.positionY)
+    ) {
+        drawPoints(
+            points = listOf(tip, backLeft, backRight, tip),
+            pointMode = PointMode.Polygon,
+            color = Color.White
+        )
     }
 }
