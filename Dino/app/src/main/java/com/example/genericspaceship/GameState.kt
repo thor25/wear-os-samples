@@ -4,28 +4,10 @@ import androidx.compose.ui.unit.IntSize
 
 object SpaceshipConstants {
 
-    const val MIN_SPEED = 0f
-    const val MAX_SPEED = 4f
-
-    /**
-     * Amount to increase acceleration values per tick, while thruster is engaged.
-     */
+    const val MIN_TRANSLATE = -4f
+    const val MAX_TRANSLATE = MIN_TRANSLATE * -1
     const val ACCELERATION_RATE = 0.1f
-
-    /**
-     * Amount to decrease acceleration values per tick, when thruster is disengaged.
-     */
-    const val ACCELERATION_DAMPING = 0.5f
-
-    /**
-     * Floor for acceleration values (so that damping is limited).
-     */
-    const val MIN_ACCELERATION = 0f
-
-    /**
-     * Ceiling for acceleration values.
-     */
-    const val MAX_ACCELERATION = MAX_SPEED * 0.1f
+    const val DECELERATION_RATE = 0.5f
 }
 
 data class GameState(
@@ -51,16 +33,9 @@ data class GameState(
          * Pivot point's y-offset from origin.
          */
         var positionY: Float = 0f,
-        var speedX: Float = SpaceshipConstants.MIN_SPEED,
-        var speedY: Float = SpaceshipConstants.MIN_SPEED,
-        /**
-         * Change in [speedX] per tick
-         */
-        var accelerationX: Float = SpaceshipConstants.MIN_ACCELERATION,
-        /**
-         * Change in [speedY] per tick
-         */
-        var accelerationY: Float = SpaceshipConstants.MIN_ACCELERATION,
+        var translateX: Float = 0f,
+        var translateY: Float = 0f,
+        var thrustersEngaged: Boolean = false,
     ) {
         /**
          * Bounding box width.

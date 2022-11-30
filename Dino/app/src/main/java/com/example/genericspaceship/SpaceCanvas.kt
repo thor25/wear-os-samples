@@ -31,6 +31,8 @@ fun SpaceCanvas(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     SpaceCanvas(
         spaceship = uiState.value.spaceship,
+        onPressEventDown = { viewModel.onPressEventDown() },
+        onPressEventUp = { viewModel.onPressEventUp() },
         onTap = { viewModel.onTap() },
         onRotate = { viewModel.onRotate(it) },
         modifier = modifier.onSizeChanged(viewModel::onCanvasSizeChange)
@@ -41,6 +43,8 @@ fun SpaceCanvas(
 @Composable
 fun SpaceCanvas(
     spaceship: UiState.Spaceship,
+    onPressEventDown: () -> Unit,
+    onPressEventUp: () -> Unit,
     onTap: () -> Unit,
     onRotate: (Float) -> Unit,
     modifier: Modifier = Modifier
@@ -50,7 +54,14 @@ fun SpaceCanvas(
         modifier = modifier
             .fillMaxSize()
             .pointerInput("screen_taps") {
-                detectTapGestures { onTap() }
+                detectTapGestures(
+                    onPress = {
+                        onPressEventDown()
+                        tryAwaitRelease()
+                        onPressEventUp()
+                    },
+                    onTap = { onTap() }
+                )
             }
             .onRotaryScrollEvent {
                 onRotate(it.verticalScrollPixels)
