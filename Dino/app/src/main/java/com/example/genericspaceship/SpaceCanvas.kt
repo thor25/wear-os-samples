@@ -1,6 +1,5 @@
 package com.example.genericspaceship
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,7 +29,6 @@ fun SpaceCanvas(
     viewModel: GameEngineViewModel = viewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    Log.d("!!!", "  uiState $uiState")
     SpaceCanvas(
         spaceship = uiState.value.spaceship,
         onTap = { viewModel.onTap() },
@@ -42,7 +40,7 @@ fun SpaceCanvas(
 @ExperimentalComposeUiApi
 @Composable
 fun SpaceCanvas(
-    spaceship: GameState.Spaceship,
+    spaceship: UiState.Spaceship,
     onTap: () -> Unit,
     onRotate: (Float) -> Unit,
     modifier: Modifier = Modifier
@@ -68,7 +66,7 @@ fun SpaceCanvas(
     }
 }
 
-private fun DrawScope.draw(spaceship: GameState.Spaceship) {
+private fun DrawScope.draw(spaceship: UiState.Spaceship) {
     val tip = Offset(spaceship.positionX, spaceship.positionY - 0.7f * spaceship.length)
     val backLeft = Offset(
         spaceship.positionX - 0.5f * spaceship.width,

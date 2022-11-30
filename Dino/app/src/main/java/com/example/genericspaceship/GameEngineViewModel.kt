@@ -1,6 +1,5 @@
 package com.example.genericspaceship
 
-import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,11 +12,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 
 class GameEngineViewModel(
-    private val state: GameState = GameState()
+    private val state: GameState = GameState(),
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(state)
-    val uiState: StateFlow<GameState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
         flow<Unit> {
@@ -52,9 +51,16 @@ class GameEngineViewModel(
     }
 
     private fun emitLatestState() {
-        Log.d("!!!", "uiState == state? ${_uiState.value == state}")
-        Log.d("!!!", "uiState ${_uiState.value}")
-        Log.d("!!!", "  state $state")
-//        _uiState.update { state.copy() }
+        _uiState.update {
+            UiState(
+                spaceship = UiState.Spaceship(
+                    width = state.spaceship.width,
+                    length = state.spaceship.length,
+                    positionX = state.spaceship.positionX,
+                    positionY = state.spaceship.positionY,
+                    rotationDegrees = state.spaceship.rotationDegrees
+                )
+            )
+        }
     }
 }
