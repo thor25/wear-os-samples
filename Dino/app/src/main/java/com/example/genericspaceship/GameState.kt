@@ -4,10 +4,9 @@ import androidx.compose.ui.unit.IntSize
 
 object SpaceshipConstants {
 
-    const val MIN_TRANSLATE = -4f
-    const val MAX_TRANSLATE = MIN_TRANSLATE * -1
-    const val ACCELERATION_RATE = 0.1f
-    const val DECELERATION_RATE = 0.5f
+    const val MAX_THRUST = 12f
+    const val THRUST_RATE = 0.25f
+    const val FRICTION = 0.05f
 }
 
 data class GameState(
@@ -33,8 +32,8 @@ data class GameState(
          * Pivot point's y-offset from origin.
          */
         var positionY: Float = 0f,
-        var translateX: Float = 0f,
-        var translateY: Float = 0f,
+        var thrustX: Float = 0f,
+        var thrustY: Float = 0f,
         var thrustersEngaged: Boolean = false,
     ) {
         /**
@@ -42,5 +41,8 @@ data class GameState(
          */
         val width
             get() = length * 0.8f
+
+        val rotationRads
+            get() = rotationDegrees / 180 * Math.PI
     }
 }

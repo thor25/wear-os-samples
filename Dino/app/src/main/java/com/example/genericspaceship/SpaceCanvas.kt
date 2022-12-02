@@ -33,7 +33,7 @@ fun SpaceCanvas(
         spaceship = uiState.value.spaceship,
         onPressEventDown = { viewModel.onPressEventDown() },
         onPressEventUp = { viewModel.onPressEventUp() },
-        onTap = { viewModel.onTap() },
+        onDoubleTap = { viewModel.onDoubleTap() },
         onRotate = { viewModel.onRotate(it) },
         modifier = modifier.onSizeChanged(viewModel::onCanvasSizeChange)
     )
@@ -45,7 +45,7 @@ fun SpaceCanvas(
     spaceship: UiState.Spaceship,
     onPressEventDown: () -> Unit,
     onPressEventUp: () -> Unit,
-    onTap: () -> Unit,
+    onDoubleTap: () -> Unit,
     onRotate: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -60,7 +60,7 @@ fun SpaceCanvas(
                         tryAwaitRelease()
                         onPressEventUp()
                     },
-                    onTap = { onTap() }
+                    onDoubleTap = { onDoubleTap() }
                 )
             }
             .onRotaryScrollEvent {
@@ -77,17 +77,24 @@ fun SpaceCanvas(
     }
 }
 
+/**
+ * It's drawn facing right, which is 0 degrees.
+ */
 private fun DrawScope.draw(spaceship: UiState.Spaceship) {
-    val tip = Offset(spaceship.positionX, spaceship.positionY - 0.7f * spaceship.length)
+    val tip = Offset(spaceship.positionX + 0.7f * spaceship.length, spaceship.positionY)
     val backLeft = Offset(
-        spaceship.positionX - 0.5f * spaceship.width,
-        spaceship.positionY + 0.3f * spaceship.length
+        spaceship.positionX - 0.3f * spaceship.length,
+        spaceship.positionY - 0.5f * spaceship.width
     )
     val backRight = Offset(
-        spaceship.positionX + 0.5f * spaceship.width,
-        spaceship.positionY + 0.3f * spaceship.length
+        spaceship.positionX - 0.3f * spaceship.length,
+        spaceship.positionY + 0.5f * spaceship.width
     )
-
+    drawCircle(
+        color = Color.Red,
+        center = Offset(spaceship.positionX, spaceship.positionY),
+        radius = 4f
+    )
     rotate(
         degrees = spaceship.rotationDegrees,
         pivot = Offset(spaceship.positionX, spaceship.positionY)

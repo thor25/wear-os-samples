@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
-import java.lang.Float.max
-import java.lang.Float.min
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
+
+private const val FPS = 30
+private const val UPDATE_INTERVAL = 1000L / FPS
 
 class GameEngineViewModel(
     private val state: GameState = GameState(),
@@ -26,9 +28,9 @@ class GameEngineViewModel(
         flow<Unit> {
             while (true) {
                 if (state.size != IntSize.Zero) {
-                    tickLoop()
+                    update()
                 }
-                delay(42L)
+                delay(UPDATE_INTERVAL)
             }
         }.launchIn(viewModelScope)
     }
@@ -49,7 +51,7 @@ class GameEngineViewModel(
         state.spaceship.thrustersEngaged = false
     }
 
-    fun onTap() {
+    fun onDoubleTap() {
         // TODO: fire
     }
 
@@ -57,61 +59,74 @@ class GameEngineViewModel(
         state.spaceship.rotationDegrees += rotationPixels
     }
 
-    private fun tickLoop() {
+    private fun update() {
         state.ticks++
         val spaceship = state.spaceship
 
         if (spaceship.thrustersEngaged) {
+            // TODO: pretend the thrusters are always engaged and get the vector math correct 😅
             spaceship.calculateSpeedIncrease()
         } else {
             spaceship.calculateSpeedReduction()
         }
 
-        spaceship.positionX += spaceship.translateX
-        spaceship.positionY += spaceship.translateY
-
-        // teleport the ship if it goes offscreen
-        val halfLength = spaceship.length * 0.5f
-        if (spaceship.positionX + halfLength < 0) {
-            spaceship.positionX = state.size.width + halfLength
-        } else if  (spaceship.positionX - halfLength > state.size.width){
-            spaceship.positionX = 0 - halfLength
-        }
-        if (spaceship.positionY + halfLength < 0) {
-            spaceship.positionY = state.size.height + halfLength
-        } else if  (spaceship.positionY - halfLength > state.size.height){
-            spaceship.positionY = 0 - halfLength
-        }
+        spaceship.positionX += spaceship.thrustX
+        spaceship.positionY += spaceship.thrustY
+        spaceship.stayOnScreen()
 
         emitLatestState()
     }
 
     /**
-     * Update [GameState.Spaceship.translateX] and [GameState.Spaceship.translateY] accounting for
+     * Update [GameState.Spaceship.thrustX] and [GameState.Spaceship.thrustY] accounting for
      * for the rotation so that the ship moves towards the direction it's pointing.
      */
     private fun GameState.Spaceship.calculateSpeedIncrease() {
-        val angle = rotationDegrees.toDouble()
-        translateX -= (SpaceshipConstants.ACCELERATION_RATE * sin(angle)).toFloat()
-        translateY -= (SpaceshipConstants.ACCELERATION_RATE * cos(angle)).toFloat()
-        clampTranslation()
-    }
+        thrustX += (SpaceshipConstants.THRUST_RATE * cos(rotationRads)).toFloat()
+        thrustY += (SpaceshipConstants.THRUST_RATE * sin(rotationRads)).toFloat()
 
-    private fun GameState.Spaceship.clampTranslation() {
-        translateX = min(translateX, SpaceshipConstants.MAX_TRANSLATE)
-        translateX = max(translateX, SpaceshipConstants.MIN_TRANSLATE)
-
-        translateY = min(translateY, SpaceshipConstants.MAX_TRANSLATE)
-        translateY = max(translateY, SpaceshipConstants.MIN_TRANSLATE)
+        thrustX = thrustX.coerceIn(
+            minimumValue = SpaceshipConstants.MAX_THRUST * -1,
+            maximumValue = SpaceshipConstants.MAX_THRUST
+        )
+        thrustY = thrustY.coerceIn(
+            minimumValue = SpaceshipConstants.MAX_THRUST * -1,
+            maximumValue = SpaceshipConstants.MAX_THRUST
+        )
     }
 
     /**
-     * Update [GameState.Spaceship.translateX] and [GameState.Spaceship.translateY] so that it
+     * Update [GameState.Spaceship.thrustX] and [GameState.Spaceship.thrustY] so that it
      * trends towards 0 (no movement).
      */
     private fun GameState.Spaceship.calculateSpeedReduction() {
-        // TODO: decay the translateXY so that it'll get to 0
-        clampTranslation()
+        thrustX = when {
+            abs(thrustX - 0) < SpaceshipConstants.FRICTION -> 0F
+            thrustX > 0 -> thrustX - SpaceshipConstants.FRICTION
+            else -> thrustX + SpaceshipConstants.FRICTION
+        }
+        thrustY = when {
+            abs(thrustY - 0) < SpaceshipConstants.FRICTION -> 0F
+            thrustY > 0 -> thrustY - SpaceshipConstants.FRICTION
+            else -> thrustY + SpaceshipConstants.FRICTION
+        }
+    }
+
+    /**
+     * Teleport the ship if it goes offscreen
+     */
+    private fun GameState.Spaceship.stayOnScreen() {
+        val halfLength = length * 0.5f
+        if (positionX + halfLength < 0) {
+            positionX = state.size.width + halfLength
+        } else if (positionX - halfLength > state.size.width) {
+            positionX = 0 - halfLength
+        }
+        if (positionY + halfLength < 0) {
+            positionY = state.size.height + halfLength
+        } else if (positionY - halfLength > state.size.height) {
+            positionY = 0 - halfLength
+        }
     }
 
     private fun emitLatestState() {
