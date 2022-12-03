@@ -10,7 +10,6 @@ object SpaceshipConstants {
 }
 
 data class GameState(
-    var ticks: Long = 0,
     var size: IntSize = IntSize.Zero,
     val spaceship: Spaceship = Spaceship()
 ) {

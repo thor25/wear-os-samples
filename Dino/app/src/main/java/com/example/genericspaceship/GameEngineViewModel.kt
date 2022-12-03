@@ -60,14 +60,12 @@ class GameEngineViewModel(
     }
 
     private fun update() {
-        state.ticks++
         val spaceship = state.spaceship
 
         if (spaceship.thrustersEngaged) {
-            // TODO: pretend the thrusters are always engaged and get the vector math correct 😅
-            spaceship.calculateSpeedIncrease()
+            spaceship.applyThrust()
         } else {
-            spaceship.calculateSpeedReduction()
+            spaceship.applyFriction()
         }
 
         spaceship.positionX += spaceship.thrustX
@@ -81,7 +79,7 @@ class GameEngineViewModel(
      * Update [GameState.Spaceship.thrustX] and [GameState.Spaceship.thrustY] accounting for
      * for the rotation so that the ship moves towards the direction it's pointing.
      */
-    private fun GameState.Spaceship.calculateSpeedIncrease() {
+    private fun GameState.Spaceship.applyThrust() {
         thrustX += (SpaceshipConstants.THRUST_RATE * cos(rotationRads)).toFloat()
         thrustY += (SpaceshipConstants.THRUST_RATE * sin(rotationRads)).toFloat()
 
@@ -99,7 +97,7 @@ class GameEngineViewModel(
      * Update [GameState.Spaceship.thrustX] and [GameState.Spaceship.thrustY] so that it
      * trends towards 0 (no movement).
      */
-    private fun GameState.Spaceship.calculateSpeedReduction() {
+    private fun GameState.Spaceship.applyFriction() {
         thrustX = when {
             abs(thrustX - 0) < SpaceshipConstants.FRICTION -> 0F
             thrustX > 0 -> thrustX - SpaceshipConstants.FRICTION
