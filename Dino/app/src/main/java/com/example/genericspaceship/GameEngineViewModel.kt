@@ -70,14 +70,14 @@ class GameEngineViewModel(
     }
 
     private fun update() {
-        val spaceship = state.spaceship
+        state.ticks++
 
+        val spaceship = state.spaceship
         if (spaceship.thrustersEngaged) {
             spaceship.applyThrust()
         } else {
             spaceship.applyFriction()
         }
-
         spaceship.positionX += spaceship.thrustX
         spaceship.positionY += spaceship.thrustY
         spaceship.stayOnScreen()
@@ -189,12 +189,14 @@ class GameEngineViewModel(
     private fun emitLatestState() {
         _uiState.update {
             UiState(
+                ticks = state.ticks,
                 spaceship = UiState.Spaceship(
                     width = state.spaceship.width,
                     length = state.spaceship.length,
                     positionX = state.spaceship.positionX,
                     positionY = state.spaceship.positionY,
-                    rotationDegrees = state.spaceship.rotationDegrees
+                    rotationDegrees = state.spaceship.rotationDegrees,
+                    thrustersEngaged = state.spaceship.thrustersEngaged
                 ),
                 shotsFired = state.shotsFired.map {
                     UiState.Shot(

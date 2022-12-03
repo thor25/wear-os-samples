@@ -12,6 +12,7 @@ object SpaceshipConstants {
 }
 
 data class GameState(
+    var ticks: Long = 0L,
     var size: IntSize = IntSize.Zero,
     var isRound: Boolean = true,
     val shotsFired: MutableList<Shot> = mutableListOf(),

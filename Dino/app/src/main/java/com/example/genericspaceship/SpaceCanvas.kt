@@ -33,6 +33,7 @@ fun SpaceCanvas(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val isRound = LocalConfiguration.current.isScreenRound
     SpaceCanvas(
+        shouldDrawJet = uiState.value.spaceship.thrustersEngaged && uiState.value.ticks % 2 == 0L,
         spaceship = uiState.value.spaceship,
         shotsFired = uiState.value.shotsFired,
         onPressEventDown = { viewModel.onPressEventDown() },
@@ -48,6 +49,7 @@ fun SpaceCanvas(
 @ExperimentalComposeUiApi
 @Composable
 fun SpaceCanvas(
+    shouldDrawJet: Boolean,
     spaceship: UiState.Spaceship,
     shotsFired: List<UiState.Shot>,
     onPressEventDown: () -> Unit,
@@ -78,7 +80,7 @@ fun SpaceCanvas(
             .focusable(true)
     ) {
         shotsFired.forEach { draw(it) }
-        draw(spaceship)
+        draw(shouldDrawJet, spaceship)
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -99,16 +101,42 @@ private fun DrawScope.draw(shot: UiState.Shot) {
 /**
  * It's drawn facing right, which is 0 degrees.
  */
-private fun DrawScope.draw(spaceship: UiState.Spaceship) {
+private fun DrawScope.draw(
+    shouldDrawJet: Boolean,
+    spaceship: UiState.Spaceship
+) {
     rotate(
         degrees = spaceship.rotationDegrees,
         pivot = Offset(spaceship.positionX, spaceship.positionY)
     ) {
+        if (shouldDrawJet) {
+            val jetPath = Path().apply {
+                moveTo(
+                    spaceship.positionX - 0.4f * spaceship.length,
+                    spaceship.positionY
+                )
+                lineTo(
+                    spaceship.positionX,
+                    spaceship.positionY + 0.3f * spaceship.width
+                )
+                lineTo(
+                    spaceship.positionX,
+                    spaceship.positionY - 0.3f * spaceship.width
+                )
+                close()
+            }
+            drawPath(jetPath, color = Color.Yellow, style = Stroke())
+        }
+
         val spaceshipPath = Path().apply {
             moveTo(spaceship.positionX + 0.7f * spaceship.length, spaceship.positionY)
             lineTo(
                 spaceship.positionX - 0.3f * spaceship.length,
                 spaceship.positionY + 0.5f * spaceship.width
+            )
+            lineTo(
+                spaceship.positionX - 0.1f * spaceship.length,
+                spaceship.positionY
             )
             lineTo(
                 spaceship.positionX - 0.3f * spaceship.length,
