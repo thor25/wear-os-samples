@@ -1,19 +1,11 @@
 package com.example.genericspaceship
 
-import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.update
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlinx.coroutines.flow.*
+import kotlin.math.*
 
 private const val FPS = 30
 private const val UPDATE_INTERVAL = 1000L / FPS
@@ -36,7 +28,8 @@ class GameEngineViewModel(
         }.launchIn(viewModelScope)
     }
 
-    fun onCanvasSizeChange(newSize: IntSize) {
+    fun onCanvasSizeChange(newSize: IntSize, isRound: Boolean) {
+        state.isRound = isRound
         if (state.size != newSize) {
             state.size = newSize
             state.spaceship.positionX = newSize.width * 0.5f
@@ -139,19 +132,57 @@ class GameEngineViewModel(
 
     /**
      * Teleport the ship if it goes offscreen
-     * TODO: Deal with round screens otherwise the corner teleports look pants
      */
     private fun GameState.Spaceship.stayOnScreen() {
+        if (state.isRound) {
+            stayOnScreenRound()
+        } else {
+            stayOnScreenRectangle()
+        }
+    }
+
+    private fun GameState.Spaceship.stayOnScreenRectangle() {
         val halfLength = length * 0.5f
         if (positionX + halfLength < 0) {
-            positionX = state.size.width + halfLength
+            positionX = state.size.width.toFloat()
         } else if (positionX - halfLength > state.size.width) {
-            positionX = 0 - halfLength
+            positionX = 0f
         }
         if (positionY + halfLength < 0) {
-            positionY = state.size.height + halfLength
+            positionY = state.size.height.toFloat()
         } else if (positionY - halfLength > state.size.height) {
-            positionY = 0 - halfLength
+            positionY = 0f
+        }
+    }
+
+    /**
+     * For round devices, it looks really weird if we assume a square canvas because it takes longer
+     * for the ship to reappear if it flies through the corners of the square which are further away
+     * from the center of the screen than the sides.
+     */
+    private fun GameState.Spaceship.stayOnScreenRound() {
+        val radius = state.size.width * 0.5
+        val centerX = radius
+        val centerY = radius
+
+        // pythagoras' theorem to see if ship is outside of the circle
+        val a = abs(positionX - centerX)
+        val b = abs(positionY - centerY)
+        val distFromCenter = sqrt(a.pow(2) + b.pow(2))
+
+        val halfLength = length * 0.5f
+        if (distFromCenter > radius + halfLength + 1) {
+            positionX = when {
+                positionX < centerX -> centerX + a
+                positionX > centerX -> centerX - a
+                else -> positionX
+            }.toFloat()
+
+            positionY = when {
+                positionY < centerY -> centerY + b
+                positionY > centerY -> centerY - b
+                else -> positionY
+            }.toFloat()
         }
     }
 

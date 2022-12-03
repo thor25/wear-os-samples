@@ -14,14 +14,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -32,6 +31,7 @@ fun SpaceCanvas(
     viewModel: GameEngineViewModel = viewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val isRound = LocalConfiguration.current.isScreenRound
     SpaceCanvas(
         spaceship = uiState.value.spaceship,
         shotsFired = uiState.value.shotsFired,
@@ -39,7 +39,9 @@ fun SpaceCanvas(
         onPressEventUp = { viewModel.onPressEventUp() },
         onDoubleTap = { viewModel.onDoubleTap() },
         onRotate = { viewModel.onRotate(it) },
-        modifier = modifier.onSizeChanged(viewModel::onCanvasSizeChange)
+        modifier = modifier.onSizeChanged {
+            viewModel.onCanvasSizeChange(it, isRound)
+        }
     )
 }
 
