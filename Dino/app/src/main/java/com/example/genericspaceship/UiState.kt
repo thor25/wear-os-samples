@@ -1,7 +1,8 @@
 package com.example.genericspaceship
 
 data class UiState(
-    val spaceship: Spaceship = Spaceship()
+    val spaceship: Spaceship = Spaceship(),
+    val shotsFired: List<Shot> = emptyList()
 ) {
     data class Spaceship(
         val width: Float = 0f,
@@ -9,6 +10,11 @@ data class UiState(
         val positionX: Float = 0f,
         val positionY: Float = 0f,
         val rotationDegrees: Float = 0f,
+    )
+
+    data class Shot(
+        val positionX: Float,
+        val positionY: Float
     )
 }
 

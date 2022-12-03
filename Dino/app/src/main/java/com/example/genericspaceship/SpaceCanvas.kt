@@ -13,8 +13,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
@@ -31,6 +34,7 @@ fun SpaceCanvas(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     SpaceCanvas(
         spaceship = uiState.value.spaceship,
+        shotsFired = uiState.value.shotsFired,
         onPressEventDown = { viewModel.onPressEventDown() },
         onPressEventUp = { viewModel.onPressEventUp() },
         onDoubleTap = { viewModel.onDoubleTap() },
@@ -43,6 +47,7 @@ fun SpaceCanvas(
 @Composable
 fun SpaceCanvas(
     spaceship: UiState.Spaceship,
+    shotsFired: List<UiState.Shot>,
     onPressEventDown: () -> Unit,
     onPressEventUp: () -> Unit,
     onDoubleTap: () -> Unit,
@@ -70,6 +75,7 @@ fun SpaceCanvas(
             .focusRequester(focusRequester)
             .focusable(true)
     ) {
+        shotsFired.forEach { draw(it) }
         draw(spaceship)
     }
     LaunchedEffect(Unit) {
@@ -80,29 +86,35 @@ fun SpaceCanvas(
 /**
  * It's drawn facing right, which is 0 degrees.
  */
-private fun DrawScope.draw(spaceship: UiState.Spaceship) {
-    val tip = Offset(spaceship.positionX + 0.7f * spaceship.length, spaceship.positionY)
-    val backLeft = Offset(
-        spaceship.positionX - 0.3f * spaceship.length,
-        spaceship.positionY - 0.5f * spaceship.width
-    )
-    val backRight = Offset(
-        spaceship.positionX - 0.3f * spaceship.length,
-        spaceship.positionY + 0.5f * spaceship.width
-    )
+private fun DrawScope.draw(shot: UiState.Shot) {
     drawCircle(
-        color = Color.Red,
-        center = Offset(spaceship.positionX, spaceship.positionY),
-        radius = 4f
+        color = Color.White,
+        center = Offset(shot.positionX, shot.positionY),
+        radius = 2f
     )
+}
+
+/**
+ * It's drawn facing right, which is 0 degrees.
+ */
+private fun DrawScope.draw(spaceship: UiState.Spaceship) {
     rotate(
         degrees = spaceship.rotationDegrees,
         pivot = Offset(spaceship.positionX, spaceship.positionY)
     ) {
-        drawPoints(
-            points = listOf(tip, backLeft, backRight, tip),
-            pointMode = PointMode.Polygon,
-            color = Color.White
-        )
+        val spaceshipPath = Path().apply {
+            moveTo(spaceship.positionX + 0.7f * spaceship.length, spaceship.positionY)
+            lineTo(
+                spaceship.positionX - 0.3f * spaceship.length,
+                spaceship.positionY + 0.5f * spaceship.width
+            )
+            lineTo(
+                spaceship.positionX - 0.3f * spaceship.length,
+                spaceship.positionY - 0.5f * spaceship.width
+            )
+            close()
+        }
+        drawPath(spaceshipPath, color = Color.Black)
+        drawPath(spaceshipPath, color = Color.White, style = Stroke())
     }
 }

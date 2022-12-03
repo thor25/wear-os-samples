@@ -1,5 +1,6 @@
 package com.example.genericspaceship
 
+import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,7 +53,23 @@ class GameEngineViewModel(
     }
 
     fun onDoubleTap() {
-        // TODO: fire
+        val spaceship = state.spaceship
+        spaceship.thrustersEngaged = false
+        state.shotsFired.add(
+            GameState.Shot(
+                positionX = spaceship.positionX,
+                positionY = spaceship.positionY,
+                bearingRads = spaceship.rotationRads,
+                endPositionX = spaceship.positionX +
+                    SpaceshipConstants.SHOT_RANGE_MULTIPLIER * SpaceshipConstants.SHOT_SPEED * cos(
+                    spaceship.rotationRads
+                ).toFloat(),
+                endPositionY = spaceship.positionY +
+                    SpaceshipConstants.SHOT_RANGE_MULTIPLIER * SpaceshipConstants.SHOT_SPEED * sin(
+                    spaceship.rotationRads
+                ).toFloat(),
+            )
+        )
     }
 
     fun onRotate(rotationPixels: Float) {
@@ -72,7 +89,17 @@ class GameEngineViewModel(
         spaceship.positionY += spaceship.thrustY
         spaceship.stayOnScreen()
 
+        state.shotsFired.forEach { shot ->
+            shot.positionX += SpaceshipConstants.SHOT_SPEED * cos(shot.bearingRads).toFloat()
+            shot.positionY += SpaceshipConstants.SHOT_SPEED * sin(shot.bearingRads).toFloat()
+        }
+        state.shotsFired.removeAll { shot -> shot.hasExhaustedRange() }
+
         emitLatestState()
+    }
+
+    private fun GameState.Shot.hasExhaustedRange(): Boolean {
+        return positionX >= endPositionX && positionY >= endPositionY
     }
 
     /**
@@ -112,6 +139,7 @@ class GameEngineViewModel(
 
     /**
      * Teleport the ship if it goes offscreen
+     * TODO: Deal with round screens otherwise the corner teleports look pants
      */
     private fun GameState.Spaceship.stayOnScreen() {
         val halfLength = length * 0.5f
@@ -136,7 +164,13 @@ class GameEngineViewModel(
                     positionX = state.spaceship.positionX,
                     positionY = state.spaceship.positionY,
                     rotationDegrees = state.spaceship.rotationDegrees
-                )
+                ),
+                shotsFired = state.shotsFired.map {
+                    UiState.Shot(
+                        positionX = it.positionX,
+                        positionY = it.positionY
+                    )
+                }
             )
         }
     }

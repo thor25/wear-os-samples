@@ -7,12 +7,23 @@ object SpaceshipConstants {
     const val MAX_THRUST = 12f
     const val THRUST_RATE = 0.25f
     const val FRICTION = 0.05f
+    const val SHOT_SPEED = MAX_THRUST + 1f
+    const val SHOT_RANGE_MULTIPLIER = 30f
 }
 
 data class GameState(
     var size: IntSize = IntSize.Zero,
+    val shotsFired: MutableList<Shot> = mutableListOf(),
     val spaceship: Spaceship = Spaceship()
 ) {
+    data class Shot(
+        var positionX: Float,
+        var positionY: Float,
+        val bearingRads: Double,
+        val endPositionX: Float,
+        val endPositionY: Float
+    )
+
     data class Spaceship(
         /**
          * Bounding box length.
