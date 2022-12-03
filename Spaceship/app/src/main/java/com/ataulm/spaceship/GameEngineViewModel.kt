@@ -1,4 +1,4 @@
-package com.example.genericspaceship
+package com.ataulm.spaceship
 
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
@@ -54,11 +54,11 @@ class GameEngineViewModel(
                 positionY = spaceship.positionY,
                 bearingRads = spaceship.rotationRads,
                 endPositionX = spaceship.positionX +
-                    SpaceshipConstants.SHOT_RANGE_MULTIPLIER * SpaceshipConstants.SHOT_SPEED * cos(
+                        SpaceshipConstants.SHOT_RANGE_MULTIPLIER * SpaceshipConstants.SHOT_SPEED * cos(
                     spaceship.rotationRads
                 ).toFloat(),
                 endPositionY = spaceship.positionY +
-                    SpaceshipConstants.SHOT_RANGE_MULTIPLIER * SpaceshipConstants.SHOT_SPEED * sin(
+                        SpaceshipConstants.SHOT_RANGE_MULTIPLIER * SpaceshipConstants.SHOT_SPEED * sin(
                     spaceship.rotationRads
                 ).toFloat(),
             )

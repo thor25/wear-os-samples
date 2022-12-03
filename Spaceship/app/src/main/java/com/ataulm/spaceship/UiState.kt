@@ -1,4 +1,4 @@
-package com.example.genericspaceship
+package com.ataulm.spaceship
 
 data class UiState(
     val ticks: Long = 0L,

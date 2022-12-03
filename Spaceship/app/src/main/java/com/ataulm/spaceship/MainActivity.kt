@@ -1,4 +1,4 @@
-package com.example.genericspaceship
+package com.ataulm.spaceship
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
