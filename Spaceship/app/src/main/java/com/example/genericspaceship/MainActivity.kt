@@ -46,21 +46,23 @@ fun SpaceCanvas(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val isRound = LocalConfiguration.current.isScreenRound
-    val gameController = object : GameController {
-        override fun onPressDownEvent() {
-            viewModel.onPressEventDown()
-        }
+    val gameController = remember {
+        object : GameController {
+            override fun onPressDownEvent() {
+                viewModel.onPressEventDown()
+            }
 
-        override fun onPressUpEvent() {
-            viewModel.onPressEventUp()
-        }
+            override fun onPressUpEvent() {
+                viewModel.onPressEventUp()
+            }
 
-        override fun onDoubleTapEvent() {
-            viewModel.onDoubleTap()
-        }
+            override fun onDoubleTapEvent() {
+                viewModel.onDoubleTap()
+            }
 
-        override fun onRotateEvent(rotationPixels: Float) {
-            viewModel.onRotate(rotationPixels)
+            override fun onRotateEvent(rotationPixels: Float) {
+                viewModel.onRotate(rotationPixels)
+            }
         }
     }
     SpaceCanvas(
