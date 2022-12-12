@@ -46,14 +46,28 @@ fun SpaceCanvas(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val isRound = LocalConfiguration.current.isScreenRound
+    val gameController = object : GameController {
+        override fun onPressDownEvent() {
+            viewModel.onPressEventDown()
+        }
+
+        override fun onPressUpEvent() {
+            viewModel.onPressEventUp()
+        }
+
+        override fun onDoubleTapEvent() {
+            viewModel.onDoubleTap()
+        }
+
+        override fun onRotateEvent(rotationPixels: Float) {
+            viewModel.onRotate(rotationPixels)
+        }
+    }
     SpaceCanvas(
         shouldDrawJet = uiState.value.spaceship.thrustersEngaged && uiState.value.ticks % 2 == 0L,
         spaceship = uiState.value.spaceship,
         shotsFired = uiState.value.shotsFired,
-        onPressEventDown = { viewModel.onPressEventDown() },
-        onPressEventUp = { viewModel.onPressEventUp() },
-        onDoubleTap = { viewModel.onDoubleTap() },
-        onRotate = { viewModel.onRotate(it) },
+        gameController = gameController,
         modifier = modifier.onSizeChanged {
             viewModel.onCanvasSizeChange(it, isRound)
         }
@@ -66,32 +80,33 @@ fun SpaceCanvas(
     shouldDrawJet: Boolean,
     spaceship: UiState.Spaceship,
     shotsFired: List<UiState.Shot>,
-    onPressEventDown: () -> Unit,
-    onPressEventUp: () -> Unit,
-    onDoubleTap: () -> Unit,
-    onRotate: (Float) -> Unit,
+    gameController: GameController,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
     Canvas(
         modifier = modifier
             .fillMaxSize()
-            .pointerInput("screen_taps") {
+            // pass `gameController` as key so that if it changes, the
+            // PointerInputScope is remade with ref to the new one
+            .pointerInput(key1 = gameController) {
                 detectTapGestures(
                     onPress = {
-                        onPressEventDown()
+                        gameController.onPressUpEvent()
                         tryAwaitRelease()
-                        onPressEventUp()
+                        gameController.onPressDownEvent()
                     },
-                    onDoubleTap = { onDoubleTap() }
+                    onDoubleTap = {
+                        gameController.onDoubleTapEvent()
+                    }
                 )
             }
+            .focusRequester(focusRequester)
             .onRotaryScrollEvent {
-                onRotate(it.verticalScrollPixels)
+                gameController.onRotateEvent(it.verticalScrollPixels)
                 true
             }
-            .focusRequester(focusRequester)
-            .focusable(true)
+            .focusable()
     ) {
         shotsFired.forEach { draw(it) }
         draw(shouldDrawJet, spaceship)
@@ -161,4 +176,11 @@ private fun DrawScope.draw(
         drawPath(spaceshipPath, color = Color.Black)
         drawPath(spaceshipPath, color = Color.White, style = Stroke())
     }
+}
+
+interface GameController {
+    fun onPressDownEvent()
+    fun onPressUpEvent()
+    fun onDoubleTapEvent()
+    fun onRotateEvent(rotationPixels: Float)
 }
