@@ -92,9 +92,9 @@ fun SpaceCanvas(
             .pointerInput(key1 = gameController) {
                 detectTapGestures(
                     onPress = {
-                        gameController.onPressUpEvent()
-                        tryAwaitRelease()
                         gameController.onPressDownEvent()
+                        tryAwaitRelease()
+                        gameController.onPressUpEvent()
                     },
                     onDoubleTap = {
                         gameController.onDoubleTapEvent()
