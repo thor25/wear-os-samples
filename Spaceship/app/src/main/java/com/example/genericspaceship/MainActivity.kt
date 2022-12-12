@@ -156,7 +156,7 @@ private fun DrawScope.draw(
                 )
                 close()
             }
-            drawPath(jetPath, color = Color.Yellow, style = Stroke())
+            drawPath(jetPath, color = Color.Yellow, style = Stroke(width = 2f))
         }
 
         val spaceshipPath = Path().apply {
@@ -176,7 +176,7 @@ private fun DrawScope.draw(
             close()
         }
         drawPath(spaceshipPath, color = Color.Black)
-        drawPath(spaceshipPath, color = Color.White, style = Stroke())
+        drawPath(spaceshipPath, color = Color.White, style = Stroke(width = 2f))
     }
 }
 
