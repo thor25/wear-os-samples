@@ -132,11 +132,11 @@ fun SpaceCanvas(
             }
             .focusable()
     ) {
+        shotsFired.forEach { draw(it) }
         rotate(
             degrees = spaceship.rotationDegrees,
             pivot = Offset(spaceship.positionX, spaceship.positionY)
         ) {
-            shotsFired.forEach { draw(it) }
             translate(spaceship.positionX, spaceship.positionY) {
                 if (shouldDrawJet) {
                     drawPath(jetPath, color = Color.Yellow, style = Stroke(width = 2f))
