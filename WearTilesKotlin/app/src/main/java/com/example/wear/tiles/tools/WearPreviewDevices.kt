@@ -51,6 +51,16 @@ public annotation class WearPreviewDevices
 public annotation class WearSmallRoundDevicePreview
 
 @Preview(
+    device = Devices.WEAR_OS_SMALL_ROUND,
+    showSystemUi = true,
+    backgroundColor = 0xff000000,
+    showBackground = true,
+    locale = "et",
+    group = "Devices - Small Round"
+)
+public annotation class WearSmallRoundDevicePreviewEstonian
+
+@Preview(
     device = Devices.WEAR_OS_LARGE_ROUND,
     showSystemUi = true,
     backgroundColor = 0xff000000,

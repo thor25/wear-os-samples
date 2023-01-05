@@ -17,4 +17,5 @@
     <string name="tile_messaging_description">Open a chat with one of your favorite contacts.</string>
     <string name="tile_messaging_search">Search</string>
     <string name="tile_messaging_create_new">New</string>
+    <string name="localized_word">Hello</string>
 </resources>

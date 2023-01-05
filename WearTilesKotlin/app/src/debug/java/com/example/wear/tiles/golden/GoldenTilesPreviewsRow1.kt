@@ -19,25 +19,15 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.example.wear.tiles.R
-import com.example.wear.tiles.tools.WearLargeRoundDevicePreview
 import com.example.wear.tiles.tools.WearSmallRoundDevicePreview
+import com.example.wear.tiles.tools.WearSmallRoundDevicePreviewEstonian
 import com.example.wear.tiles.tools.emptyClickable
 import com.google.android.horologist.compose.tools.LayoutRootPreview
 import com.google.android.horologist.compose.tools.buildDeviceParameters
 import com.google.android.horologist.tiles.images.drawableResToImageResource
 
 @WearSmallRoundDevicePreview
-@WearLargeRoundDevicePreview
-@Composable
-fun Goal() {
-    val context = LocalContext.current
-    LayoutRootPreview(
-        Goal.layout(context, context.deviceParams(), steps = 5168, goal = 8000)
-    )
-}
-
-@WearSmallRoundDevicePreview
-@WearLargeRoundDevicePreview
+@WearSmallRoundDevicePreviewEstonian
 @Composable
 fun WorkoutButtons() {
     val context = LocalContext.current
@@ -45,7 +35,7 @@ fun WorkoutButtons() {
         Workout.buttonsLayout(
             context,
             context.deviceParams(),
-            weekSummary = "1 run this week",
+            weekSummary = context.getString(R.string.localized_word),//"1 run this week",
             button1Clickable = emptyClickable,
             button2Clickable = emptyClickable,
             button3Clickable = emptyClickable,
@@ -65,58 +55,6 @@ fun WorkoutButtons() {
             drawableResToImageResource(R.drawable.ic_cycling_24)
         )
     }
-}
-
-@WearSmallRoundDevicePreview
-@WearLargeRoundDevicePreview
-@Composable
-fun WorkoutLargeChip() {
-    val context = LocalContext.current
-    LayoutRootPreview(
-        Workout.largeChipLayout(
-            context,
-            context.deviceParams(),
-            clickable = emptyClickable,
-            lastWorkoutSummary = "Last session 45m"
-        )
-    )
-}
-
-@WearSmallRoundDevicePreview
-@WearLargeRoundDevicePreview
-@Composable
-fun Run() {
-    val context = LocalContext.current
-    LayoutRootPreview(
-        Run.layout(
-            context,
-            context.deviceParams(),
-            lastRunText = "2 days ago",
-            startRunClickable = emptyClickable,
-            moreChipClickable = emptyClickable
-        )
-    )
-}
-
-@WearSmallRoundDevicePreview
-@WearLargeRoundDevicePreview
-@Composable
-fun Ski() {
-    val context = LocalContext.current
-    LayoutRootPreview(
-        Ski.layout(
-            context,
-            stat1 = Ski.Stat("Max Spd", "46.5", "mph"),
-            stat2 = Ski.Stat("Distance", "21.8", "mile")
-        )
-    )
-}
-
-@WearSmallRoundDevicePreview
-@WearLargeRoundDevicePreview
-@Composable
-fun SleepTracker() {
-    // TODO: yuri has an example of this one
 }
 
 private fun Context.deviceParams() = buildDeviceParameters(resources)
