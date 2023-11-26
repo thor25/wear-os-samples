@@ -1,12 +1,12 @@
 [versions]
-android-gradle-plugin = "8.1.2"
+android-gradle-plugin = "8.1.3"
 androidx-wear-tiles = "1.2.0"
 androidx-wear-tooling-preview = "0"
-compose = "1.5.3"
-compose-compiler = "1.5.3"
-horologist = "0.5.7"
+compose = "1.5.4"
+compose-compiler = "1.5.4"
+horologist = "0.5.10"
 ktlint = "0.50.0"
-org-jetbrains-kotlin = "1.9.10"
+org-jetbrains-kotlin = "1.9.20"
 org-jetbrains-kotlinx = "1.7.3"
 
 [libraries]
@@ -15,7 +15,7 @@ androidx-lifecycle-runtime-ktx = "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2
 androidx-lifecycle-viewmodel-ktx = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
 androidx-wear-tiles-material = { module = "androidx.wear.tiles:tiles-material", version.ref = "androidx-wear-tiles" }
 androidx-wear-tooling-preview = { module = "androidx.wear:wear-tooling-preview", version.ref = "androidx-wear-tooling-preview" }
-coil = "io.coil-kt:coil-compose:2.4.0"
+coil = "io.coil-kt:coil-compose:2.5.0"
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 horologist-compose-tools = { module = "com.google.android.horologist:horologist-compose-tools", version.ref = "horologist" }
@@ -23,6 +23,7 @@ horologist-tiles = { module = "com.google.android.horologist:horologist-tiles", 
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "org-jetbrains-kotlinx" }
 kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "org-jetbrains-kotlinx" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }

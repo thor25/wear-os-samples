@@ -1,19 +1,19 @@
 [versions]
-android-gradle-plugin = "8.1.2"
+android-gradle-plugin = "8.1.3"
 androidx-activity = "1.8.0"
-androidx-benchmark = "1.1.1"
-androidx-compose-bom = "2023.10.00"
+androidx-benchmark = "1.2.0"
+androidx-compose-bom = "2023.10.01"
 androidx-lifecycle = "2.6.2"
 androidx-test-espresso = "3.5.1"
 androidx-test-ext = "1.1.5"
 androidx-test-uiautomator = "2.2.0"
-androidx-wear-compose = "1.2.0"
-compose = "1.5.3"
-compose-compiler = "1.5.3"
-horologist = "0.5.7"
+androidx-wear-compose = "1.2.1"
+compose = "1.5.4"
+compose-compiler = "1.5.4"
+horologist = "0.5.10"
 ktlint = "0.50.0"
-navigation = "2.7.4"
-org-jetbrains-kotlin = "1.9.10"
+navigation = "2.7.5"
+org-jetbrains-kotlin = "1.9.20"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -31,8 +31,8 @@ androidx-test-ext = { module = "androidx.test.ext:junit", version.ref = "android
 androidx-test-ext-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidx-test-ext" }
 androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidx-test-uiautomator" }
 androidx-tracing-ktx = "androidx.tracing:tracing-ktx:1.1.0"
-com-google-maps-compose = "com.google.maps.android:maps-compose:3.1.0"
-com-google-play-services-maps = "com.google.android.gms:play-services-maps:18.1.0"
+com-google-maps-compose = "com.google.maps.android:maps-compose:4.2.0"
+com-google-play-services-maps = "com.google.android.gms:play-services-maps:18.2.0"
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
 
 # Remove version.ref for compose dependencies below if you want to use Compose BoM and stable releases
@@ -47,7 +47,7 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 horologist-composables = { module = "com.google.android.horologist:horologist-composables", version.ref = "horologist" }
 horologist-compose-layout = { module = "com.google.android.horologist:horologist-compose-layout", version.ref = "horologist" }
 horologist-compose-material = { module = "com.google.android.horologist:horologist-compose-material", version.ref = "horologist" }
-jacoco-ant = "org.jacoco:org.jacoco.ant:0.8.10"
+jacoco-ant = "org.jacoco:org.jacoco.ant:0.8.11"
 junit = "junit:junit:4.13.2"
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "org-jetbrains-kotlin" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
