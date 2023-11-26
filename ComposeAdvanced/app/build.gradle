@@ -142,6 +142,7 @@ dependencies {
 
     implementation libs.androidx.splashscreen
     implementation libs.androidx.tracing.ktx
+    implementation libs.play.services.wearable
 
     // Testing
     testImplementation libs.junit

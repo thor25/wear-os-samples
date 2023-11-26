@@ -59,6 +59,7 @@ wear-compose-material = { module = "androidx.wear.compose:compose-material", ver
 wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation", version.ref = "androidx-wear-compose" }
 wear-compose-tooling = { module = "androidx.wear.compose:compose-ui-tooling", version.ref = "androidx-wear-compose" }
 wear-input = "androidx.wear:wear-input:1.2.0-alpha02"
+play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version = "18.1.0" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
